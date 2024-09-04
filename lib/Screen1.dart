@@ -80,7 +80,7 @@ class _Screen1State extends State<Screen1> {
                     return GestureDetector(onTap:(){Navigator.push(context,MaterialPageRoute(builder: (_)=>Screen2()));},
                       child: Container(
                         width: 169.w,
-                        height: 275.h,
+                        height: 305.h,
                         clipBehavior: Clip.antiAlias,
                         decoration: ShapeDecoration(
                           color: Colors.white,
@@ -92,7 +92,7 @@ class _Screen1State extends State<Screen1> {
                           children: [
                             Container(
                               width: 169.w,
-                              height: 178.h,
+                              height: 158.h,
                               decoration: ShapeDecoration(
                                 color: colors[index],
                                 shape: RoundedRectangleBorder(
