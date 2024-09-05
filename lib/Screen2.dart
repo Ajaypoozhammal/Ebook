@@ -1,17 +1,41 @@
+import 'package:ebook/Repository/Modelclass/SummeryModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'Block/summery_bloc.dart';
 import 'Screen1.dart';
 
 class Screen2 extends StatefulWidget {
-  const Screen2({super.key});
+  final String image;
+  final String title;
+  final String writter;
+  final String page;
+  final String language;
+
+  const Screen2({super.key,
+    required this.image,
+    required this.title,
+    required this.writter,
+    required this.page,
+    required this.language});
 
   @override
   State<Screen2> createState() => _Screen2State();
+
 }
 
 class _Screen2State extends State<Screen2> {
+  late SummeryModel data1;
+
+  @override
+  void initState() {
+    BlocProvider.of<SummeryBloc>(context).add(FetchSummery());
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +43,7 @@ class _Screen2State extends State<Screen2> {
         child: Column(
           children: [
             AppBar(
+                centerTitle: true,
                 leading: Column(
                   children: [
                     GestureDetector(
@@ -37,7 +62,7 @@ class _Screen2State extends State<Screen2> {
                   child: Column(
                     children: [
                       Text(
-                        'One Dark Window',
+                        widget.title,
                         style: GoogleFonts.playfair(
                           textStyle: TextStyle(
                             color: Colors.black,
@@ -47,7 +72,7 @@ class _Screen2State extends State<Screen2> {
                         ),
                       ),
                       Text(
-                        'Rachel Gillig',
+                        widget.writter,
                         style: GoogleFonts.inter(
                           textStyle: TextStyle(
                             color: Color(0xFF686868),
@@ -66,16 +91,13 @@ class _Screen2State extends State<Screen2> {
                   width: double.infinity,
                   height: 300.h,
                   color: Colors.white,
-                  child: Center(
-                      child: Image.asset(
-                    "assets/a.png",
-                  )),
+                  child: Center(child: Image.network(widget.image)),
                 ),
                 Positioned(
                   top: 280,
-                  left: 30,
+                  left: 10,
                   child: Container(
-                    width: 295,
+                    width: 275,
                     height: 54,
                     clipBehavior: Clip.antiAlias,
                     decoration: ShapeDecoration(
@@ -119,10 +141,10 @@ class _Screen2State extends State<Screen2> {
                                 '4.0',
                                 style: GoogleFonts.inter(
                                     textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w400,
-                                )),
+                                      color: Colors.black,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w400,
+                                    )),
                               ),
                             ],
                           ),
@@ -142,7 +164,7 @@ class _Screen2State extends State<Screen2> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Fantasy',
+                                    widget.language,
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         color: Color(0xFF153337),
@@ -159,13 +181,13 @@ class _Screen2State extends State<Screen2> {
                                 width: 70.w,
                                 height: 30.h,
                                 decoration: ShapeDecoration(
-                                  color: Colors.white,
+                                  color: Color(0xFFFFF8DF),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8)),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    '432 Pages',
+                                    widget.page,
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         color: Color(0xFF153337),
@@ -189,23 +211,40 @@ class _Screen2State extends State<Screen2> {
                 'Synopsis',
                 style: GoogleFonts.playfairDisplay(
                     textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w600,
-                )),
+                      color: Colors.black,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w600,
+                    )),
               ),
             ),
             SizedBox(
               height: 20.h,
             ),
-            Text(
-              'Elspeth needs a monster. The monster might be her. Elspeth Spindle needs more than luck to stay safe in the eerie, mist-locked kingdom of Blunder—she needs a monster. She calls him the Nightmare, an ancient, mercurial spirit trapped in her head. He protects her. He keeps her secrets.\n \nBut nothing comes for free, especially magic. When Elspeth meets a mysterious highwayman on the forest road, her life takes a drastic turn. Thrust into a world of shadow and deception, she joins a dangerous quest to cure Blunder from the dark magic infecting it. And the highwayman? He just so happens to be the King’s nephew, Captain of the most dangerous men in Blunder…and guilty of high treason.\n\nTogether they must gather twelve Providence Cards—the keys to the cure. But as the stakes heighten and their undeniable attraction intensifies, Elspeth is forced to face her darkest secret yet: the Nightmare is slowly taking over her mind. And she might not be able to stop him.',
-              style: GoogleFonts.inter(
-                  textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-              )),
+            BlocBuilder<SummeryBloc, SummeryState>(
+              builder: (context, state) {
+    if (state is SummeryBlocLoading) {
+    return Center(
+    child: CircularProgressIndicator(),
+    );
+    }
+    if (state is SummeryBlocError) {
+    return Center(
+    child: Text("Error"),
+    );
+    }
+    if (state is SummeryBlocLoaded) {
+    data1 = BlocProvider.of<SummeryBloc>(context).summeryModel;
+                return Text(
+                  data1.summary!.toString(), style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                    )),
+                );}else{
+      return SizedBox();
+    }
+              },
             ),
             Container(
               width: 393,
@@ -226,9 +265,12 @@ class _Screen2State extends State<Screen2> {
                 padding: const EdgeInsets.only(left: 10),
                 child: Row(
                   children: [
-                    CircleAvatar(radius: 25,backgroundColor: Colors.black,
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.black,
                       child: CircleAvatar(
-                        radius: 24,backgroundColor: Colors.white,
+                        radius: 24,
+                        backgroundColor: Colors.white,
                         child: Icon(
                           Icons.bookmark_border_sharp,
                           size: 30,
@@ -238,7 +280,7 @@ class _Screen2State extends State<Screen2> {
                     Padding(
                       padding: const EdgeInsets.only(left: 40),
                       child: Container(
-                        width: 250,
+                        width: 200,
                         height: 52,
                         decoration: ShapeDecoration(
                           color: Color(0xFF404066),
@@ -251,9 +293,9 @@ class _Screen2State extends State<Screen2> {
                             'Buy Now',
                             style: GoogleFonts.inter(
                               textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
